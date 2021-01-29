@@ -1,47 +1,52 @@
 // Imports
 const express = require("express");
+const morgan = require("morgan");
+const mongoose = require("mongoose");
+const Blog = require("./models/blog");
+const { render } = require("ejs");
 
 // Data
 const PORT = 3000;
+const DBURI =
+  "mongodb+srv://darcy:Bruce2001MDB@node-tutorial.tvw5b.mongodb.net/node-tutorial?retryWrites=true&w=majority"; // Connect to MongoDB
 
 // Express application
 const app = express();
 
+// Connect to MongoDB
+mongoose
+  .connect(DBURI, { useNewUrlParser: true, useUnifiedTopology: true })
+  .then((res) => app.listen(PORT)) // Listen for requests
+  .catch((err) => console.log(err));
+
 // Register view engine
 app.set("view engine", "ejs");
 
-// Listen for requests
-app.listen(PORT);
+// Middlewear and static files
+app.use(express.static("public"));
+app.use(morgan("dev"));
 
 // Get index
 app.get("/", (req, res) => {
   //res.send("<p>Homepage</p>"); // send() automatically infers the correct header
   //res.sendFile("./views/index.html", { root: __dirname }); // Send an entire file to client
 
-  const blogs = [
-    {
-      title: "Yoshi finds eggs",
-      snippet: "Lorem ipsum dolor sit amet consectetur",
-    },
-    {
-      title: "Mario finds stars",
-      snippet: "Lorem ipsum dolor sit amet consectetur",
-    },
-    {
-      title: "How to defeat bowser",
-      snippet: "Lorem ipsum dolor sit amet consectetur",
-    },
-  ];
-
-  res.render("index", { title: "Home", blogs }); // Render a page using view engine and send to client
+  Blog.find()
+    .sort({ createdAt: -1 })
+    .then((result) => {
+      res.render("index", { title: "All blogs", blogs: result });
+    })
+    .catch((err) => {
+      console.log(err);
+    });
 });
 
 // Get about
 app.get("/about", (req, res) => {
-  res.render("about", { title: "About" });
+  res.render("about", { title: "About" }); // Render a page using view engine and send to client
 });
 
-// Get about
+// Get create
 app.get("/blogs/create", (req, res) => {
   res.render("create", { title: "Create" });
 });
