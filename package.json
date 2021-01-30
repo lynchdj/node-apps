@@ -1,0 +1,6 @@
+{
+  "private": true,
+  "dependencies": {
+    "@tensorflow/tfjs-node": "^3.0.0"
+  }
+}
