@@ -7,7 +7,7 @@ const blogSchema = new Schema(
     snippet: { type: String, required: true },
     body: { type: String, required: true },
   },
-  { timeStamps: true }
+  { timestamps: true }
 );
 
 const Blog = mongoose.model("Blog", blogSchema);

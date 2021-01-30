@@ -2,8 +2,7 @@
 const express = require("express");
 const morgan = require("morgan");
 const mongoose = require("mongoose");
-const Blog = require("./models/blog");
-const { render } = require("ejs");
+const blogRoutes = require("./routes/blogRoutes");
 
 // Data
 const PORT = 3000;
@@ -24,39 +23,28 @@ app.set("view engine", "ejs");
 
 // Middlewear and static files
 app.use(express.static("public"));
+app.use(express.urlencoded({ extended: true }));
 app.use(morgan("dev"));
 
-// Get index
+// Get index page
 app.get("/", (req, res) => {
-  //res.send("<p>Homepage</p>"); // send() automatically infers the correct header
-  //res.sendFile("./views/index.html", { root: __dirname }); // Send an entire file to client
-
-  Blog.find()
-    .sort({ createdAt: -1 })
-    .then((result) => {
-      res.render("index", { title: "All blogs", blogs: result });
-    })
-    .catch((err) => {
-      console.log(err);
-    });
+  res.redirect("/blogs");
 });
 
-// Get about
+// All blog routes
+app.use("/blogs", blogRoutes);
+
+// Get about page
 app.get("/about", (req, res) => {
   res.render("about", { title: "About" }); // Render a page using view engine and send to client
 });
 
-// Get create
-app.get("/blogs/create", (req, res) => {
-  res.render("create", { title: "Create" });
-});
-
-// Redirect about-us
+// Redirect about-us to about page
 app.get("/about-us", (req, res) => {
   res.redirect("/about");
 });
 
-// 404 page
+// Get 404 page
 app.use((req, res) => {
   res.status(404).render("404", { title: "404" });
 });
